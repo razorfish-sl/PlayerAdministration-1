@@ -27,6 +27,7 @@
  * Single-line comments - // Single-line comment
  * Multi-line comments -- Just like this comment block!
  */
+
 using Newtonsoft.Json;
 using Oxide.Core;
 using Oxide.Core.Libraries.Covalence;
@@ -43,7 +44,7 @@ using RustLib = Oxide.Game.Rust.Libraries.Rust;
 
 namespace Oxide.Plugins
 {
-    [Info("PlayerAdministration", "ThibmoRozier", "1.6.8")]
+    [Info("PlayerAdministration", "ThibmoRozier", "1.6.9")]
     [Description("Allows server admins to moderate users using a GUI from within the game.")]
     public class PlayerAdministration : CovalencePlugin
     {
@@ -1276,23 +1277,13 @@ namespace Oxide.Plugins
         /// <param name="aPlayer">Player who's information we need to display</param>
         private void AddUserPageInfoLabels(ref Cui aUIObj, string aParent, ulong aPlayerId, ref BasePlayer aPlayer) {
             string lastCheatStr = lang.GetMessage("Never Label Text", this, aUIObj.PlayerIdString);
-            string authLevel = ServerUsers.Get(aPlayerId)?.group.ToString() ?? "None";
-           
+            string authLevel = ServerUsers.Get(aPlayerId)?.group.ToString() ?? "None";        
             string CpAddress = lang.GetMessage("OffLine Label Text", this, aUIObj.PlayerIdString);
             string CpPing = lang.GetMessage("OffLine Label Text", this, aUIObj.PlayerIdString);
 
-            // Recover & pre-process user conenction data(player should be connected so calls are safe)
+            // Recover & pre-process user connection data(player should be connected so calls are safe)
             if (aPlayer.IsConnected)
             {
-                CpAddress = aPlayer.net.connection.ipaddress.Split(':')[0];
-                CpPing = Network.Net.sv.GetAveragePing(aPlayer.net.connection).ToString();
-            }
-
-            string CpAddress = lang.GetMessage("OffLine Label Text", this, aUIObj.PlayerIdString);
-            string CpPing = lang.GetMessage("OffLine Label Text", this, aUIObj.PlayerIdString);
-
-            // Recover & pre-process user conenction data(player should be connected so calls are safe)
-            if (aPlayer.IsConnected) {
                 CpAddress = aPlayer.net.connection.ipaddress.Split(':')[0];
                 CpPing = Network.Net.sv.GetAveragePing(aPlayer.net.connection).ToString();
             }
@@ -1454,7 +1445,7 @@ namespace Oxide.Plugins
                 );
                 aUIObj.AddLabel(
                     aParent, CUserPageLblComfortLbAnchor, CUserPageLblComfortRtAnchor, CuiColor.TextAlt,
-                    string.Format(lang.GetMessage("Comfort Label Format", this, aUIObj.PlayerIdString), aPlayer.metabolism?.comfort?.value), string.Empty, 14,
+                    string.Format(lang.GetMessage("Comfort Label Format", this, aUIObj.PlayerIdString),100* aPlayer.metabolism?.comfort?.value), string.Empty, 14,
                     TextAnchor.MiddleLeft
                 );
                 aUIObj.AddLabel(
@@ -3217,7 +3208,7 @@ namespace Oxide.Plugins
             if (!VerifyPermission(ref player, CPermBackpacks, true) || !GetTargetFromArg(aArgs, out targetId))
                 return;
 
-            Backpacks.Call("ViewBackpack", player, string.Empty, new[] { targetId.ToString() });
+            player.SendConsoleCommand($"chat.say \"/viewbackpack {targetId}\"");
             LogInfo($"{player.displayName}: Viewed backpack of {targetId}");
             PlayerAdministrationCloseUICallback(player.IPlayer, string.Empty, new[] { string.Empty });
         }
